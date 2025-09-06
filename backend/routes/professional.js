@@ -6,5 +6,5 @@ const router = express.Router();
 
 //GET  /feed /post
 router.get("/", professionalController.getData);
-//localhost:8800/professionals
+//localhost:8080/professionals
 module.exports = router;
