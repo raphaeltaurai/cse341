@@ -3,9 +3,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const professionalRoutes  = require('./routes/professional');
 const app = express();
-const {MongoClient} = require('mongodb');
 require('dotenv').config();
-
+const database = require('./db/database');
 
 app.use(bodyParser.json());
 
@@ -17,20 +16,17 @@ res.setHeader("Access-Control-Allow-Origin", "*");
 next();
 });
 
-// MongoDB connection
-let db;
-
-MongoClient.connect(process.env.MONGODB_URI)
-  .then(client => {
-    console.log('Connected to MongoDB');
-    db = client.db(process.env.MONGODB_DB);
-    // Make db available to other modules
-    app.locals.db = db;
-  })
-  .catch(err => {
-    console.error('MongoDB connection error:', err);
-  });
+// Initialize database connection
+database.connectToMongoDB()
+    .then(db => {
+        app.locals.db = db;
+    })
+    .catch(err => {
+        console.error('Failed to connect to database:', err);
+    });
 
 app.use('/professional', professionalRoutes);
 
-app.listen(8080);
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, () => {console.log(`Server is running on http://localhost:${PORT}`); });
